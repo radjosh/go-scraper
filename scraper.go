@@ -2,24 +2,22 @@ package main
 
 import (
 	"fmt"
-	"net/http"
-	"github.com/PuerkitoBio/goquery"
+	"os"
+	"github.com/anaskhan96/soup"
 )
 
 func main() {
 	url := "https://www.scrapingcourse.com/ecommerce/"
 
-	resp, _ := http.Get(url)
-	defer resp.Body.Close()
+	resp, err := soup.Get(url)
+	if err != nil {
+		os.Exit(1)
+	}
 
-	doc, _ := goquery.NewDocumentFromReader(resp.Body)
+	doc := soup.HTMLParse(resp)
 
-	var productNames []string
-	doc.Find("h2").Each(func(i int, s *goquery.Selection) {
-		productNames.append(productNames, s.Text())
-	})
-
+	productNames := doc.Find("div").FindAll("h2")
 	for _, name := range productNames {
-		fmt.Println(name)
+		fmt.Println(name.Text())
 	}
 }
